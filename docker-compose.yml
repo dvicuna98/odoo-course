@@ -1,0 +1,53 @@
+version: '3.5'
+
+networks:
+  odoonet:
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16
+
+services:
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: odoo
+    volumes:
+      - ./:/app
+    ports:
+      - "8079:8069"
+    depends_on:
+      - odoodb
+    tty: true
+    restart: unless-stopped
+    networks:
+      odoonet:
+
+  odoodb:
+    container_name: odoodb
+    image: postgres:15.8
+    environment:
+      POSTGRES_USER: "odoo"
+      POSTGRES_PASSWORD: "odoo"
+    volumes:
+      # Keep Postgres data directory between reboots
+      - pgdata:/pgdata
+    restart: unless-stopped
+    networks:
+      odoonet:
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container-odoo
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      odoonet:
+
+volumes:
+  pgdata:
