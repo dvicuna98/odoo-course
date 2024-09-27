@@ -9,6 +9,9 @@
     'data' : [
         'security/ir.model.access.csv',
         'views/menu.xml',
-        'views/estate_property.xml'
+        'views/estate_property.xml',
+
+        #Load initial Data
+        'data/estate.property.csv'
     ]
 }

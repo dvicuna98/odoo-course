@@ -7,50 +7,18 @@ from odoo.exceptions import ValidationError, UserError
 class EstateProperty(models.Model):
     _name = 'estate.property'
     _description = 'EstateProperty'
+    _order = "date_availability desc"
 
     _sql_constraints = [
-        (
-            'unique_name',
-            'UNIQUE(name)',
-            'The name must be unique'
-        ),
-        (
-            'check_percentage',
-            'CHECK(facades >= 0 and facades <= 100)',
-            'The number input should be between 0 and 100'
-        )
+        ('unique_name', 'UNIQUE(name)', 'The name must be unique'),
+        ('check_percentage', 'CHECK(facades >= 0 and facades <= 100)', 'Facades must be between 0 and 100'),
     ]
 
-    # @api.constrains('date_end')
-    # def _check_date_end(self):
-    #     for record in self:
-    #         if record.date_end < fields.Date.today():
-    #             raise ValidationError("The end date cannot be set in the past.")
-
-    @api.constrains('selling_price')
-    def _check_selling_price(self):
-        for record in self:
-            if record.selling_price < 0:
-                raise ValidationError('The selling_price must be positive')
-
-    @api.depends('living_area','garden_area')
-    def _compute_total_area(self):
-        for prop in self:
-            prop.total_area = prop.living_area + prop.garden_area
-
-    @api.onchange('garden')
-    def _onchange_garden(self):
-        if self.garden:
-            self.garden_area = 10
-            self.garden_orientation = 'N'
-        else:
-            self.garden_area = 0
-            self.garden_orientation = False
-
-    # @api.depends('offer_ids.price')
-    # def _compute_price(self):
-    #     for prop in self:
-    #         prop.best_price = max(prop.offer_ids.price, prop.price)
+    @api.model
+    def create(self, vals):
+        if vals.get("selling_price") and vals.get("date_availability"):
+            vals["state"] = "offer_received"
+        return super(EstateProperty, self).create(vals)
 
     def action_sold(self):
         if "canceled" in self.mapped("state"):
@@ -67,14 +35,14 @@ class EstateProperty(models.Model):
     description = fields.Text(string='Description', default="Estate description")
     postcode = fields.Char(string='Postcode')
     date_availability = fields.Date(string='Date Availability')
-    expected_price = fields.Float(string='Expected Price')
-    selling_price = fields.Float(string='Selling Price')
-    bedrooms = fields.Integer(string='Bedrooms')
-    living_area = fields.Integer(string='Living Area')
-    facades = fields.Integer(string='Facades')
+    expected_price = fields.Float(string='Expected Price', default=0.0)
+    selling_price = fields.Float(string='Selling Price', default=0.0)
+    bedrooms = fields.Integer(string='Bedrooms', default=0)
+    living_area = fields.Integer(string='Living Area', default=0)
+    facades = fields.Integer(string='Facades', default=0)
     garage = fields.Boolean(string='Garage')
     garden = fields.Boolean(string='Garden')
-    garden_area = fields.Integer(string='Garden Area')
+    garden_area = fields.Integer(string='Garden Area', default=0)
     garden_orientation = fields.Selection(
         string='Garden Orientation',
         selection=[("N", "North"),("S", "South"),("E", "East"),("W", "West")],
@@ -87,14 +55,40 @@ class EstateProperty(models.Model):
     total_area = fields.Integer(string='Total Area', readonly=True, compute="_compute_total_area")
     state = fields.Selection(
         selection=[
-            ("new","New"),
-            ("offer_received","Offer Received"),
-            ("offer_accepted","Offer Accepted"),
-            ("sold","Sold"),
-            ("canceled","Canceled"),
+            ("new", "New"),
+            ("offer_received", "Offer Received"),
+            ("offer_accepted", "Offer Accepted"),
+            ("sold", "Sold"),
+            ("canceled", "Canceled"),
         ],
         string='Status',
         required=True,
         default='new',
         copy=False,
     )
+
+    @api.depends('living_area', 'garden_area')
+    def _compute_total_area(self):
+        for prop in self:
+            prop.total_area = (prop.living_area or 0) + (prop.garden_area or 0)
+
+    @api.constrains('selling_price')
+    def _check_selling_price(self):
+        for record in self:
+            if record.selling_price < 0:
+                raise ValidationError('The selling_price must be positive')
+
+    @api.onchange('garden')
+    def _onchange_garden(self):
+        if self.garden:
+            self.garden_area = 10
+            self.garden_orientation = 'N'
+        else:
+            self.garden_area = 0
+            self.garden_orientation = False
+
+    # @api.depends('offer_ids.price')
+    # def _compute_price(self):
+    #     for prop in self:
+    #         prop.best_price = max(prop.offer_ids.price, prop.price)
+
