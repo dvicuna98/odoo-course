@@ -1,0 +1,79 @@
+<odoo>
+    <data>
+        <record id="estate_property_view_search" model="ir.ui.view">
+            <field name="name">Estate property search</field>
+            <field name="model">estate.property</field>
+            <field name="arch" type="xml">
+                <search string="Tests">
+                    <filter name="Postal code is Set" domain="[('postcode','&gt;',0)]"/>
+                    <field name="name"/>
+                    <field name="postcode"/>
+                </search>
+            </field>
+        </record>
+        <record id="estate_property_view_tree" model="ir.ui.view">
+            <field name="name">Estate property list</field>
+            <field name="model">estate.property</field>
+            <field name="arch" type="xml">
+                <tree string="Estate property list">
+                    <field name="name"/>
+                    <field name="postcode"/>
+                    <field name="date_availability"/>
+                </tree>
+            </field>
+        </record>
+        <record id="estate_property_view_form" model="ir.ui.view">
+            <field name="name">Estate property list</field>
+            <field name="model">estate.property</field>
+            <field name="arch" type="xml">
+                <form string="Test">
+                    <header>
+                        <button name="action_sold" type="object" string="Sold" invisible="state=='offer_accepted'" class="oe_highlight"/>
+                        <button name="action_cancel" type="object" string="Cancel" invisible="state=='new' or state=='offer_received' or state=='offer_accepted'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="new,offer_received,offer_accepted,sold"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="postcode"/>
+                                <field name="expected_price"/>
+                                <field name="selling_price"/>
+                            </group>
+                            <group>
+                                <field name="bedrooms"/>
+                                <field name="living_area"/>
+                                <field name="facades"/>
+                                <field name="garage"/>
+                            </group>
+                            <group>
+                                <field name="garden"/>
+                                <field name="garden_area"/>
+                                <field name="garden_orientation"/>
+                            </group>
+                            <group>
+                                <field name="last_seen"/>
+                            </group>
+                            <notebook>
+                                <page string="Description">
+                                    <field name="description"/>
+                                </page>
+                                <page string="PIC and Customer">
+                                    <group>
+                                        <field name="user_id"/>
+                                        <field name="buyer_id"/>
+                                    </group>
+                                </page>
+                                <page string="Information">
+                                    <group>
+                                        <field name="total_area" />
+                                    </group>
+                                </page>
+                            </notebook>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

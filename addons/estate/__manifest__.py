@@ -8,6 +8,7 @@
     'description': "This module doesnt do anything",
     'data' : [
         'security/ir.model.access.csv',
-        'views/menu.xml'
+        'views/menu.xml',
+        'views/estate_property.xml'
     ]
 }
