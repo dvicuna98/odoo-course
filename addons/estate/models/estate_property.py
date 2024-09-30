@@ -87,6 +87,10 @@ class EstateProperty(models.Model):
             self.garden_area = 0
             self.garden_orientation = False
 
+    def update_state_schedule(self):
+        self.env["estate.property"].search([('date_availability', '=', False)]).write({'state': 'new'})
+
+
     # @api.depends('offer_ids.price')
     # def _compute_price(self):
     #     for prop in self:

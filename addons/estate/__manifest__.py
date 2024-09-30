@@ -12,6 +12,9 @@
         'views/estate_property.xml',
 
         #Load initial Data
-        'data/estate.property.csv'
+        'data/estate.property.csv',
+
+        #scheduler
+        'views/schedulers/estate_property_scheduler.xml'
     ]
 }
