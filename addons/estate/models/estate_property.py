@@ -1,5 +1,3 @@
-from email.policy import default
-
 from odoo import fields, models, api
 from odoo.exceptions import ValidationError, UserError
 
@@ -30,6 +28,23 @@ class EstateProperty(models.Model):
                 raise UserError("Sold properties are not to be canceled")
 
         return self.write({'state': 'canceled'})
+
+    def action_send_email(self):
+        template = self.env.ref["estate.simple_example_email_template"]
+        email_values = {
+            "email_to": "howace3333@aiworldx.com",
+            "email_cc": False,
+            "auto_delete": True,
+            "recipient_ids": [],
+            "partner_ids": [],
+            "scheduled_date": False,
+            "email_from":"howace3333@aiworldx.com"
+        }
+        template.send_mail(
+            self.id,
+            email_values = email_values,
+            force_send = True
+        )
 
     name = fields.Char(string='Name', required=True)
     description = fields.Text(string='Description', default="Estate description")
