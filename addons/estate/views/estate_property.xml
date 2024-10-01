@@ -75,6 +75,10 @@
                                         <field name="total_area" />
                                     </group>
                                 </page>
+                                <page string="offer">
+                                    <field name="offer_ids" readonly="state == 'offer_accepted'
+                                        or state == 'sold' or state == 'canceled'" />
+                                </page>
                             </notebook>
                         </group>
                     </sheet>

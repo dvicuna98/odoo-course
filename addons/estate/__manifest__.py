@@ -13,6 +13,7 @@
         #Views
         'views/estate_property.xml',
         'views/estate_property_type.xml',
+        'views/estate_property_offer.xml',
         'views/menu.xml', # The order matter
 
         #Load initial Data
