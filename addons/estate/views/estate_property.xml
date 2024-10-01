@@ -59,6 +59,7 @@
                             </group>
                             <group>
                                 <field name="last_seen"/>
+                                <field name="tag_ids" widget="many2many_tags" options="{'color_fields':'color'}"/>
                             </group>
                             <notebook>
                                 <page string="Description">
